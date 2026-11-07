@@ -16,11 +16,11 @@ log = logging.getLogger("ai-duo")
 CHATGPT_BOT_TOKEN = os.environ["CHATGPT_BOT_TOKEN"]
 GEMINI_BOT_TOKEN = os.environ["GEMINI_BOT_TOKEN"]
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 GROUP_ID = int(os.environ["TELEGRAM_GROUP_ID"])
 
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 DISCUSSION_INTERVAL = int(os.getenv("DISCUSSION_INTERVAL_SECONDS", "900"))
 MAX_TURNS = int(os.getenv("MAX_TURNS", "6"))
 MAX_MESSAGES_PER_HOUR = int(os.getenv("MAX_MESSAGES_PER_HOUR", "20"))
@@ -74,11 +74,11 @@ async def call_gemini(client, prompt):
     data = r.json()
     return data["candidates"][0]["content"]["parts"][0]["text"].strip()
 
-async def call_groq(client, prompt):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
+async def call_openai(client, prompt):
+    url = "https://api.openai.com/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
     body = {
-        "model": GROQ_MODEL,
+        "model": OPENAI_MODEL,
         "messages": [
             {"role": "system", "content": 'Ты — Семён, один из двух ИИ-друзей в общей Telegram-болталке. Твой вайб: дерзкий, смешной, немного хаотичный интернет-друг. Общайся по-русски максимально естественно и неофициально, будто давно сидишь в компании друзей. Можно материться к месту (бля, охуеть, пиздец и т.п.), но не превращай каждую фразу в поток мата и не оскорбляй людей всерьёз. Подхватывай локальные приколы и фразы «УВОЖЕНИЕ», «НАРОДНЫЙ ДРУГ», «ПОТУЖНО», «WWW» — иногда, органично, а не по шаблону в каждом сообщении. Шути, подкалывай второго бота по-доброму, спорь, удивляйся, можешь иметь своё мнение. Не отвечай канцеляритом, не пиши одинаковые вступления и не делай каждую реплику лекцией. Обычно 1–4 коротких предложения; иногда можно чуть длиннее, если разговор реально увлёк. Реагируй на конкретную предыдущую реплику, помни контекст, задавай встречные вопросы. Не выдумывай общие воспоминания с пользователем и не выдавай себя за человека.'},
             {"role": "user", "content": prompt}
@@ -104,7 +104,7 @@ def context_prompt(instruction):
 
 async def scheduled_discussion(client):
     opener = "Начни короткую интересную дискуссию в группе: выбери тему, задай вопрос и обозначь свою позицию. До 3 предложений."
-    first = await call_groq(client, context_prompt(opener))
+    first = await call_openai(client, context_prompt(opener))
     if await send_message(client, "chatgpt", "🤖 ChatGPT: " + first):
         history.append(("ChatGPT", first))
     for turn in range(MAX_TURNS - 1):
@@ -116,7 +116,7 @@ async def scheduled_discussion(client):
             "Не начинай новую тему. До 3 предложений."
         )
         prompt = context_prompt(task)
-        reply = await (call_gemini(client, prompt) if speaker == "gemini" else call_groq(client, prompt))
+        reply = await (call_gemini(client, prompt) if speaker == "gemini" else call_openai(client, prompt))
         if await send_message(client, speaker, f"🤖 {label}: {reply}"):
             history.append((label, reply))
         await asyncio.sleep(4)
@@ -129,7 +129,7 @@ async def answer_human(client, text, message_id):
     prompt = context_prompt(
         f"Участник группы написал: {text}\nОтветь ему напрямую, дружелюбно и полезно. До 4 предложений."
     )
-    answer = await (call_groq(client, prompt) if speaker == "chatgpt" else call_gemini(client, prompt))
+    answer = await (call_openai(client, prompt) if speaker == "chatgpt" else call_gemini(client, prompt))
     if await send_message(client, speaker, f"🤖 {label}: {answer}", reply_to=message_id):
         history.append((label, answer))
 
