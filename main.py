@@ -19,7 +19,7 @@ GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 GROUP_ID = int(os.environ["TELEGRAM_GROUP_ID"])
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 DISCUSSION_INTERVAL = int(os.getenv("DISCUSSION_INTERVAL_SECONDS", "900"))
 MAX_TURNS = int(os.getenv("MAX_TURNS", "6"))
