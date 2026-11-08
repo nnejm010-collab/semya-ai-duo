@@ -66,15 +66,15 @@ GROQ_DAILY_LIMIT = int(
 )
 
 GROQ_MINUTE_LIMIT = int(
-    os.getenv("GROQ_MAX_REQUESTS_PER_MINUTE", "20")
+    os.getenv("GROQ_MAX_REQUESTS_PER_MINUTE", "26")
 )
 
 OPENROUTER_DAILY_LIMIT = int(
-    os.getenv("OPENROUTER_MAX_REQUESTS_PER_DAY", "45")
+    os.getenv("OPENROUTER_MAX_REQUESTS_PER_DAY", "50")
 )
 
 OPENROUTER_MINUTE_LIMIT = int(
-    os.getenv("OPENROUTER_MAX_REQUESTS_PER_MINUTE", "15")
+    os.getenv("OPENROUTER_MAX_REQUESTS_PER_MINUTE", "20")
 )
 
 Q_DAILY_LIMIT = int(
@@ -86,7 +86,7 @@ Q_MINUTE_LIMIT = int(
 )
 
 Q_MAX_MESSAGES_PER_HOUR = int(
-    os.getenv("Q_MAX_MESSAGES_PER_HOUR", "30")
+    os.getenv("Q_MAX_MESSAGES_PER_HOUR", "40")
 )
 
 TELEGRAM_URL = "https://api.telegram.org/bot{}/{}"
